@@ -1,5 +1,6 @@
 import { ApolloServer } from '@apollo/server'
 import { startStandaloneServer } from '@apollo/server/standalone'
+import { v1 as uuid } from 'uuid'
 
 let authors = [
   {
@@ -85,10 +86,6 @@ let books = [
   },
 ]
 
-/*
-  you can remove the placeholder query once your first one has been implemented 
-*/
-
 const typeDefs = /* GraphQL */ `
   type Author {
     name: String!
@@ -110,6 +107,10 @@ const typeDefs = /* GraphQL */ `
     authorCount: Int!
     allBooks(author: String, genre: String): [Book!]!
     allAuthors: [Author!]!
+  }
+
+  type Mutation {
+    addBook(title: String!, published: Int!, author: String!, genres: [String!]!): Book
   }
 `
 
@@ -134,6 +135,30 @@ const resolvers = {
       return fBooks
     },
     allAuthors: () => authors,
+  },
+  Mutation: {
+    addBook: (root, args) => {
+      const newBook = {
+        title: args.title,
+        published: args.published,
+        author: args.author,
+        id: uuid(),
+        genres: args.genres,
+      }
+
+      books = [...books, newBook]
+
+      if (!authors.some((author) => author.name === args.author)) {
+        const newAuthor = {
+          name: args.author,
+          id: uuid(),
+        }
+
+        authors = [...authors, newAuthor]
+      }
+
+      return newBook
+    },
   },
 }
 
