@@ -19,19 +19,19 @@ let authors = [
     born: 1821,
   },
   {
-    name: 'Joshua Kerievsky', // birthyear not known
+    name: 'Joshua Kerievsky', // birth year not known
     id: 'afa5b6f2-344d-11e9-a414-719c6709cf3e',
   },
   {
-    name: 'Sandi Metz', // birthyear not known
+    name: 'Sandi Metz', // birth year not known
     id: 'afa5b6f3-344d-11e9-a414-719c6709cf3e',
   },
 ]
 
 /*
  * It might make more sense to associate a book with its author by storing the author's
- * id in the context of the book instead of the author's name.
- * However, for simplicity, we will store the author's name in connection with the book.
+ * id in the context of the book instead of the author's name. However, for simplicity,
+ * we will store the author's name in connection with the book.
  */
 
 let books = [
@@ -111,6 +111,7 @@ const typeDefs = /* GraphQL */ `
 
   type Mutation {
     addBook(title: String!, published: Int!, author: String!, genres: [String!]!): Book
+    editAuthor(name: String!, setBornTo: Int!): Author
   }
 `
 
@@ -158,6 +159,23 @@ const resolvers = {
       }
 
       return newBook
+    },
+    editAuthor: (root, args) => {
+      let foundAuthor = authors.find((author) => author.name === args.name)
+      if (!foundAuthor) {
+        return null
+      }
+
+      foundAuthor = { ...foundAuthor, born: args.setBornTo }
+
+      authors = authors.map((author) => {
+        if (author.name === foundAuthor.name) {
+          return foundAuthor
+        }
+        return author
+      })
+
+      return foundAuthor
     },
   },
 }
