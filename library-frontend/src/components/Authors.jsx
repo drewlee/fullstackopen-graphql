@@ -1,5 +1,6 @@
 import { useQuery } from '@apollo/client/react'
 import { ALL_AUTHORS } from '../queries'
+import EditAuthor from './EditAuthor'
 
 const Authors = ({ show }) => {
   const result = useQuery(ALL_AUTHORS)
@@ -11,6 +12,7 @@ const Authors = ({ show }) => {
   return (
     <div>
       <h2>authors</h2>
+
       <table>
         <tbody>
           <tr>
@@ -27,6 +29,8 @@ const Authors = ({ show }) => {
           ))}
         </tbody>
       </table>
+
+      <EditAuthor />
     </div>
   )
 }
