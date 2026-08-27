@@ -4,11 +4,7 @@ import { ALL_AUTHORS } from '../queries'
 const Authors = ({ show }) => {
   const result = useQuery(ALL_AUTHORS)
 
-  if (!show) {
-    return null
-  }
-
-  if (!result.data) {
+  if (!show || !result.data) {
     return null
   }
 
