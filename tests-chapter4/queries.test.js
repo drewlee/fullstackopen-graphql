@@ -1,6 +1,6 @@
-const { describe, test, before, after } = require('node:test')
-const assert = require('node:assert')
-const {
+import { describe, test, before, after } from 'node:test'
+import assert from 'node:assert'
+import {
   setupDatabase,
   teardownDatabase,
   seedDatabase,
@@ -8,7 +8,7 @@ const {
   createServer,
   initialBooks,
   initialAuthors,
-} = require('./test_helper')
+} from './test_helper.js'
 
 let server
 
@@ -92,9 +92,7 @@ describe('allBooks', () => {
     const result = response.body.singleResult
     assert.strictEqual(result.errors, undefined)
 
-    const expectedBooks = initialBooks.filter((b) =>
-      b.genres.includes('refactoring'),
-    )
+    const expectedBooks = initialBooks.filter((b) => b.genres.includes('refactoring'))
     assert.strictEqual(result.data.allBooks.length, expectedBooks.length)
 
     for (const book of result.data.allBooks) {
@@ -144,15 +142,11 @@ describe('allAuthors', () => {
       assert.ok(author.id, 'author should have id')
     }
 
-    const robert = result.data.allAuthors.find(
-      (a) => a.name === 'Robert Martin',
-    )
+    const robert = result.data.allAuthors.find((a) => a.name === 'Robert Martin')
     assert.strictEqual(robert.born, 1952)
 
     // Author created from book seed (Joshua Kerievsky) should have born: null
-    const joshua = result.data.allAuthors.find(
-      (a) => a.name === 'Joshua Kerievsky',
-    )
+    const joshua = result.data.allAuthors.find((a) => a.name === 'Joshua Kerievsky')
     assert.strictEqual(joshua.born, null)
   })
 })

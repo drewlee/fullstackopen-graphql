@@ -1,14 +1,12 @@
-const {
-  ApolloServer,
-} = require('../library-backend/node_modules/@apollo/server')
-const { MongoMemoryServer } = require('mongodb-memory-server')
-const mongoose = require('../library-backend/node_modules/mongoose')
+import { ApolloServer } from '../library-backend/node_modules/@apollo/server/dist/esm/index.js'
+import { MongoMemoryServer } from 'mongodb-memory-server'
+import mongoose from '../library-backend/node_modules/mongoose/index.js'
 
-const typeDefs = require('../library-backend/schema')
-const resolvers = require('../library-backend/resolvers')
-const Author = require('../library-backend/models/author')
-const Book = require('../library-backend/models/book')
-const User = require('../library-backend/models/user')
+import { typeDefs } from '../library-backend/schema.js'
+import { resolvers } from '../library-backend/resolvers.js'
+import Author from '../library-backend/models/author.js'
+import Book from '../library-backend/models/book.js'
+import User from '../library-backend/models/user.js'
 
 process.env.JWT_SECRET = 'test-secret-key'
 
@@ -96,10 +94,7 @@ const seedDatabase = async () => {
   }
 }
 
-const createTestUser = async (
-  username = 'testuser',
-  favoriteGenre = 'refactoring',
-) => {
+const createTestUser = async (username = 'testuser', favoriteGenre = 'refactoring') => {
   const user = new User({ username, favoriteGenre })
   await user.save()
   return user
@@ -109,7 +104,7 @@ const createServer = () => {
   return new ApolloServer({ typeDefs, resolvers })
 }
 
-module.exports = {
+export {
   initialAuthors,
   initialBooks,
   setupDatabase,

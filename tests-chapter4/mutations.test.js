@@ -1,6 +1,6 @@
-const { describe, test, before, after, beforeEach } = require('node:test')
-const assert = require('node:assert')
-const {
+import { describe, test, before, after, beforeEach } from 'node:test'
+import assert from 'node:assert'
+import {
   setupDatabase,
   teardownDatabase,
   seedDatabase,
@@ -10,7 +10,7 @@ const {
   Author,
   Book,
   User,
-} = require('./test_helper')
+} from './test_helper.js'
 
 let server
 
@@ -228,8 +228,7 @@ describe('addBook', () => {
     const errorMessages = result.errors.map((e) => e.message.toLowerCase())
     assert.ok(
       errorMessages.some(
-        (msg) =>
-          msg.includes('not authenticated') || msg.includes('authentication'),
+        (msg) => msg.includes('not authenticated') || msg.includes('authentication'),
       ),
       `expected "not authenticated" error, got: ${errorMessages.join(', ')}`,
     )
@@ -345,8 +344,7 @@ describe('editAuthor', () => {
     const errorMessages = result.errors.map((e) => e.message.toLowerCase())
     assert.ok(
       errorMessages.some(
-        (msg) =>
-          msg.includes('not authenticated') || msg.includes('authentication'),
+        (msg) => msg.includes('not authenticated') || msg.includes('authentication'),
       ),
       `expected "not authenticated" error, got: ${errorMessages.join(', ')}`,
     )

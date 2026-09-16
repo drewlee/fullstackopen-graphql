@@ -2,10 +2,15 @@
   "name": "library-backend-tests",
   "version": "1.0.0",
   "description": "Automated tests for Full Stack Open part8 library-backend",
+  "type": "module",
   "scripts": {
     "test": "node --test"
   },
   "dependencies": {
     "mongodb-memory-server": "^10.4.0"
+  },
+  "volta": {
+    "node": "24.19.0",
+    "npm": "12.0.2"
   }
 }
