@@ -1,5 +1,8 @@
+import { GraphQLError } from 'graphql'
+import jwt from 'jsonwebtoken'
 import Book from './models/book.js'
 import Author from './models/author.js'
+import User from './models/user.js'
 
 const resolvers = {
   Author: {
@@ -31,10 +34,20 @@ const resolvers = {
     },
 
     allAuthors: async () => Author.find({}),
+
+    me: async (root, args, { currentUser }) => currentUser,
   },
 
   Mutation: {
-    addBook: async (root, args) => {
+    addBook: async (root, args, { currentUser }) => {
+      if (!currentUser) {
+        throw new GraphQLError('Not authenticated', {
+          extensions: {
+            code: 'UNAUTHENTICATED',
+          },
+        })
+      }
+
       const titleExists = await Book.exists({ title: args.title })
 
       if (titleExists) {
@@ -89,13 +102,21 @@ const resolvers = {
       return book
     },
 
-    editAuthor: async (root, args) => {
-      const author = await Author.findOne({ name: args.name })
+    editAuthor: async (root, { name, setBornTo }, { currentUser }) => {
+      if (!currentUser) {
+        throw new GraphQLError('Not authenticated', {
+          extensions: {
+            code: 'UNAUTHENTICATED',
+          },
+        })
+      }
+
+      const author = await Author.findOne({ name })
       if (!author) {
         return null
       }
 
-      author.born = args.setBornTo
+      author.born = setBornTo
 
       try {
         author.save()
@@ -103,13 +124,50 @@ const resolvers = {
         throw new GraphQLError(`Saving author failed: ${error.message}`, {
           extensions: {
             code: 'BAD_USER_INPUT',
-            invalidArgs: args.name,
+            invalidArgs: name,
             error,
           },
         })
       }
 
       return author
+    },
+
+    createUser: async (root, { username, favoriteGenre }) => {
+      const user = new User({ username, favoriteGenre })
+
+      try {
+        await user.save()
+      } catch (error) {
+        throw new GraphQLError(`Creating the user failed: ${error.message}`, {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+            invalidArgs: username,
+            error,
+          },
+        })
+      }
+
+      return user
+    },
+
+    login: async (root, { username, password }) => {
+      const user = await User.findOne({ username })
+
+      if (!user || password !== 'secret') {
+        throw new GraphQLError('Invalid credentials', {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+          },
+        })
+      }
+
+      const userForToken = {
+        username: user.username,
+        id: user._id,
+      }
+
+      return { value: jwt.sign(userForToken, process.env.JWT_SECRET) }
     },
   },
 }
