@@ -1,16 +1,18 @@
 import { useState } from 'react'
-import { useQuery } from '@apollo/client/react'
+import { useQuery, useLazyQuery } from '@apollo/client/react'
 import { ALL_BOOKS } from '../queries'
+import BooksTable from './BooksTable'
 
 const Books = ({ show }) => {
-  const [selectedGenres, setSelectedGenres] = useState([])
-  const result = useQuery(ALL_BOOKS)
+  const [selectedGenre, setSelectedGenre] = useState(null)
+  const booksAll = useQuery(ALL_BOOKS)
+  const [getBooksByGenre, booksByGenre] = useLazyQuery(ALL_BOOKS)
 
-  if (!show || !result.data) {
+  if (!show || !booksAll.data) {
     return null
   }
 
-  const { allBooks } = result.data
+  const { allBooks } = booksAll.data
   const allGenres = allBooks.reduce((genres, book) => {
     for (const genre of book.genres) {
       genres.add(genre)
@@ -18,23 +20,20 @@ const Books = ({ show }) => {
     return genres
   }, new Set())
   const sortedGenres = [...allGenres].toSorted()
-  const filteredBooks = selectedGenres.length
-    ? allBooks.filter((book) => {
-        for (const genre of book.genres) {
-          if (selectedGenres.includes(genre)) {
-            return true
-          }
-        }
-        return false
-      })
-    : allBooks
 
-  const handleGenreClick = (genre) => {
-    if (selectedGenres.includes(genre)) {
-      setSelectedGenres(selectedGenres.filter((currGenre) => currGenre !== genre))
-    } else {
-      setSelectedGenres([...selectedGenres, genre])
-    }
+  let books = allBooks
+
+  if (booksByGenre.data) {
+    books = booksByGenre.data.allBooks
+  } else if (booksByGenre.previousData) {
+    books = booksByGenre.previousData.allBooks
+  }
+
+  const handleGenreClick = async (genre) => {
+    const options = genre ? { variables: { genre } } : undefined
+
+    await getBooksByGenre(options)
+    setSelectedGenre(genre)
   }
 
   return (
@@ -48,31 +47,19 @@ const Books = ({ show }) => {
               {genre}
             </button>
           ))}
+          <button type="button" onClick={() => handleGenreClick(null)}>
+            all
+          </button>
         </div>
       )}
 
-      {selectedGenres.length > 0 && (
+      {selectedGenre && (
         <p>
-          By genre: <strong>{selectedGenres.join(', ')}</strong>
+          By genre: <strong>{selectedGenre}</strong>
         </p>
       )}
 
-      <table>
-        <tbody>
-          <tr>
-            <th></th>
-            <th>author</th>
-            <th>published</th>
-          </tr>
-          {filteredBooks.map((a) => (
-            <tr key={a.id}>
-              <td>{a.title}</td>
-              <td>{a.author.name}</td>
-              <td>{a.published}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <BooksTable books={books} />
     </div>
   )
 }
