@@ -5,7 +5,7 @@ import BooksTable from './BooksTable'
 const Recommended = ({ show }) => {
   const user = useQuery(ME)
   const options = user.data
-    ? { variables: { genre: user.data.me.favoriteGenre } }
+    ? { variables: { genre: user.data?.me?.favoriteGenre } }
     : undefined
   const books = useQuery(ALL_BOOKS, options)
 
@@ -13,7 +13,7 @@ const Recommended = ({ show }) => {
     return null
   }
 
-  const genre = user.data.me.favoriteGenre
+  const genre = user.data?.me?.favoriteGenre
   const { allBooks } = books.data
 
   return (

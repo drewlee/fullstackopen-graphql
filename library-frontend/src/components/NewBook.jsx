@@ -15,14 +15,15 @@ const NewBook = (props) => {
       const { addBook } = response.data
 
       for (const genre of [...addBook.genres, undefined]) {
-        cache.updateQuery(
-          { query: ALL_BOOKS, variables: { genre } },
-          ({ allBooks }) => {
-            return {
-              allBooks: [...allBooks, addBook],
-            }
-          },
-        )
+        cache.updateQuery({ query: ALL_BOOKS, variables: { genre } }, (props) => {
+          if (!props) {
+            return
+          }
+
+          return {
+            allBooks: [...props.allBooks, addBook],
+          }
+        })
       }
     },
   })

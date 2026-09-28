@@ -23,13 +23,14 @@ const EditAuthor = ({ authors }) => {
 
   return (
     <div>
-      <h2>set birth year</h2>
+      <h2>Set birthyear</h2>
 
       <form onSubmit={handleSubmit} className="author-form">
         <div className="author-form_field">
           <label htmlFor="name">name</label>
           <select
             id="name"
+            name="name"
             value={name}
             onChange={({ target }) => setName(target.value)}
             required
@@ -39,14 +40,6 @@ const EditAuthor = ({ authors }) => {
               <option key={author.id}>{author.name}</option>
             ))}
           </select>
-
-          {/*<input
-            id="name"
-            type="text"
-            value={name}
-            onChange={({ target }) => setName(target.value)}
-            required
-          />*/}
         </div>
 
         <div className="author-form_field">

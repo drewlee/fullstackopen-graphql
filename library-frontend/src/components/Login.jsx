@@ -1,19 +1,23 @@
 import { useState } from 'react'
-import { useMutation } from '@apollo/client/react'
-import { LOGIN } from '../queries'
+import { useMutation, useApolloClient } from '@apollo/client/react'
+import { LOGIN, ME } from '../queries'
 
 const Login = ({ show, setToken, setPage }) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [valError, setValError] = useState(null)
+  const client = useApolloClient()
 
   const [login] = useMutation(LOGIN, {
     onCompleted: (data) => {
       const token = data.login.value
+
       setToken(token)
       localStorage.setItem('bookapp-user-token', token)
+      client.refetchQueries({ include: [ME] })
     },
     onError: (error) => {
-      alert(error.message)
+      setValError(`Login failed: ${error.message}`)
     },
   })
 
@@ -26,6 +30,8 @@ const Login = ({ show, setToken, setPage }) => {
     if (!nUsername || !nPassword) {
       return
     }
+
+    setValError(null)
 
     await login({
       variables: {
@@ -45,6 +51,7 @@ const Login = ({ show, setToken, setPage }) => {
 
   return (
     <form onSubmit={handleSubmit}>
+      {valError && <p>{valError}</p>}
       <div className="">
         <label htmlFor="username">username</label>
         <input

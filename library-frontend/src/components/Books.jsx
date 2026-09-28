@@ -48,14 +48,14 @@ const Books = ({ show }) => {
             </button>
           ))}
           <button type="button" onClick={() => handleGenreClick(null)}>
-            all
+            all genres
           </button>
         </div>
       )}
 
       {selectedGenre && (
         <p>
-          By genre: <strong>{selectedGenre}</strong>
+          in genre: <strong>{selectedGenre}</strong>
         </p>
       )}
 
