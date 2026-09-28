@@ -43,10 +43,11 @@ export const CREATE_BOOK = gql`
     addBook(title: $title, published: $published, author: $author, genres: $genres) {
       id
       title
+      published
+      genres
       author {
         name
       }
-      published
     }
   }
 `
